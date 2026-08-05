@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#222"/></marker><style>text{font-family:Arial,sans-serif;fill:#222}.lane{fill:#fff;stroke:#222;stroke-width:2}.task{fill:#fff;stroke:#222;stroke-width:2.5}.flow{fill:none;stroke:#222;stroke-width:2.2;marker-end:url(#arrow)}.label{font-size:16px}.small{font-size:13px}.title{font-size:22px;font-weight:bold}.laneName{font-size:15px;font-weight:bold}</style></defs>
+<text x="40" y="35" class="title">Mitlex: заявка на закупку — от создания до оплаты</text>
+<rect x="35" y="60" width="1530" height="1020" class="lane"/>
+<rect x="35" y="60" width="1530" height="195" class="lane"/><rect x="35" y="255" width="1530" height="195" class="lane"/><rect x="35" y="450" width="1530" height="195" class="lane"/><rect x="35" y="645" width="1530" height="195" class="lane"/><rect x="35" y="840" width="1530" height="240" class="lane"/>
+<g transform="translate(62 175) rotate(-90)"><text class="laneName">Инициатор</text></g><g transform="translate(62 390) rotate(-90)"><text class="laneName">Снабжение</text></g><g transform="translate(62 590) rotate(-90)"><text class="laneName">Финансы</text></g><g transform="translate(62 785) rotate(-90)"><text class="laneName">Бухгалтерия</text></g><g transform="translate(62 1010) rotate(-90)"><text class="laneName">Yandex Tracker / Flask / Messenger</text></g>
+<!-- events and tasks -->
+<circle cx="140" cy="158" r="24" fill="#fff" stroke="#222" stroke-width="3"/><text x="95" y="205" class="small">Потребность</text>
+<rect x="205" y="112" width="160" height="92" rx="14" class="task"/><text x="230" y="150" class="label">Создать заявку</text><text x="232" y="174" class="label">в Yandex Forms</text>
+<rect x="430" y="307" width="175" height="92" rx="14" class="task"/><text x="447" y="344" class="label">Создать задачу</text><text x="450" y="368" class="label">в Tracker</text>
+<polygon points="690,330 730,370 690,410 650,370" fill="#fff" stroke="#222" stroke-width="2.5"/><text x="654" y="434" class="small">Данные полны?</text>
+<rect x="770" y="112" width="160" height="92" rx="14" class="task"/><text x="791" y="150" class="label">Уточнить</text><text x="785" y="174" class="label">данные заявки</text>
+<rect x="790" y="307" width="185" height="92" rx="14" class="task"/><text x="806" y="342" class="label">Проверить потребность</text><text x="820" y="366" class="label">и условия</text>
+<polygon points="1050,330 1090,370 1050,410 1010,370" fill="#fff" stroke="#222" stroke-width="2.5"/><text x="1002" y="434" class="small">Согласована?</text>
+<rect x="1125" y="502" width="180" height="92" rx="14" class="task"/><text x="1142" y="539" class="label">Согласовать счёт</text><text x="1155" y="563" class="label">и оплату</text>
+<polygon points="1380,525 1420,565 1380,605 1340,565" fill="#fff" stroke="#222" stroke-width="2.5"/><text x="1332" y="630" class="small">Одобрена?</text>
+<rect x="1190" y="697" width="145" height="92" rx="14" class="task"/><text x="1212" y="735" class="label">Провести</text><text x="1227" y="759" class="label">оплату</text>
+<rect x="1390" y="697" width="140" height="92" rx="14" class="task"/><text x="1402" y="735" class="label">Загрузить</text><text x="1401" y="759" class="label">платёжку</text>
+<rect x="1050" y="905" width="170" height="92" rx="14" class="task"/><text x="1065" y="943" class="label">Принять webhook</text><text x="1085" y="967" class="label">JSON-событие</text>
+<rect x="1310" y="905" width="175" height="92" rx="14" class="task"/><text x="1325" y="943" class="label">Отправить статус</text><text x="1330" y="967" class="label">в чат / тред</text>
+<circle cx="1515" cy="951" r="25" fill="#fff" stroke="#222" stroke-width="5"/><text x="1410" y="1025" class="small">Оплата подтверждена</text>
+<circle cx="1520" cy="370" r="25" fill="#fff" stroke="#222" stroke-width="5"/><text x="1470" y="430" class="small">Отклонено</text>
+<!-- straight orthogonal flows -->
+<path d="M164 158 H205" class="flow"/><path d="M365 158 H400 V353 H430" class="flow"/><path d="M605 353 H650" class="flow"/>
+<path d="M690 330 V250 H850 V204" class="flow"/><text x="705" y="270" class="small">Нет</text><path d="M770 158 H730 V330" class="flow"/><path d="M730 370 H790" class="flow"/><text x="748" y="360" class="small">Да</text>
+<path d="M975 353 H1010" class="flow"/><path d="M1090 370 H1520" class="flow"/><text x="1120" y="360" class="small">Нет</text><path d="M1050 410 V548 H1125" class="flow"/><text x="1063" y="490" class="small">Да</text>
+<path d="M1305 548 H1340" class="flow"/><path d="M1420 565 H1520" class="flow"/><text x="1440" y="555" class="small">Нет</text><path d="M1380 605 V660 H1262 V697" class="flow"/><text x="1395" y="650" class="small">Да</text>
+<path d="M1335 743 H1390" class="flow"/><path d="M1460 789 V951 H1220" class="flow"/><path d="M1220 951 H1310" class="flow"/><path d="M1485 951 H1490" class="flow"/>
+</svg>

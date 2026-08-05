@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Mitlex" targetNamespace="https://mitlex.example/bpmn">
+  <bpmn:process id="Mitlex_Procurement_To_Payment" name="Заявка на закупку: от создания до оплаты" isExecutable="false">
+    <bpmn:laneSet id="LaneSet">
+      <bpmn:lane id="Lane_Initiator" name="Инициатор"><bpmn:flowNodeRef>StartEvent</bpmn:flowNodeRef><bpmn:flowNodeRef>CreateRequest</bpmn:flowNodeRef><bpmn:flowNodeRef>Clarify</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Снабжение"><bpmn:flowNodeRef>CreateTrackerIssue</bpmn:flowNodeRef><bpmn:flowNodeRef>DataComplete</bpmn:flowNodeRef><bpmn:flowNodeRef>ProcurementReview</bpmn:flowNodeRef><bpmn:flowNodeRef>ProcurementApproved</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Finance" name="Финансы"><bpmn:flowNodeRef>FinanceApproval</bpmn:flowNodeRef><bpmn:flowNodeRef>PaymentApproved</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Accounting" name="Бухгалтерия"><bpmn:flowNodeRef>PayInvoice</bpmn:flowNodeRef><bpmn:flowNodeRef>UploadPaymentOrder</bpmn:flowNodeRef><bpmn:flowNodeRef>PaidEnd</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Service" name="Yandex Tracker / Flask / Messenger"><bpmn:flowNodeRef>Webhook</bpmn:flowNodeRef><bpmn:flowNodeRef>NotifyChat</bpmn:flowNodeRef></bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent" name="Потребность в закупке" />
+    <bpmn:userTask id="CreateRequest" name="Создать заявку в Yandex Forms" />
+    <bpmn:serviceTask id="CreateTrackerIssue" name="Создать задачу в Yandex Tracker" />
+    <bpmn:exclusiveGateway id="DataComplete" name="Данные полны?" />
+    <bpmn:userTask id="Clarify" name="Уточнить данные заявки" />
+    <bpmn:userTask id="ProcurementReview" name="Проверить потребность и условия" />
+    <bpmn:exclusiveGateway id="ProcurementApproved" name="Закупка согласована?" />
+    <bpmn:userTask id="FinanceApproval" name="Согласовать счёт и оплату" />
+    <bpmn:exclusiveGateway id="PaymentApproved" name="Оплата одобрена?" />
+    <bpmn:userTask id="PayInvoice" name="Провести оплату" />
+    <bpmn:userTask id="UploadPaymentOrder" name="Загрузить платёжное поручение" />
+    <bpmn:serviceTask id="Webhook" name="Принять webhook JSON-событие" />
+    <bpmn:serviceTask id="NotifyChat" name="Отправить обновление в чат / тред" />
+    <bpmn:endEvent id="PaidEnd" name="Оплата подтверждена" />
+    <bpmn:endEvent id="RejectedEnd" name="Заявка отклонена" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent" targetRef="CreateRequest" /><bpmn:sequenceFlow id="Flow_2" sourceRef="CreateRequest" targetRef="CreateTrackerIssue" /><bpmn:sequenceFlow id="Flow_3" sourceRef="CreateTrackerIssue" targetRef="DataComplete" />
+    <bpmn:sequenceFlow id="Flow_4" name="Нет" sourceRef="DataComplete" targetRef="Clarify" /><bpmn:sequenceFlow id="Flow_5" sourceRef="Clarify" targetRef="CreateRequest" /><bpmn:sequenceFlow id="Flow_6" name="Да" sourceRef="DataComplete" targetRef="ProcurementReview" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="ProcurementReview" targetRef="ProcurementApproved" /><bpmn:sequenceFlow id="Flow_8" name="Нет" sourceRef="ProcurementApproved" targetRef="RejectedEnd" /><bpmn:sequenceFlow id="Flow_9" name="Да" sourceRef="ProcurementApproved" targetRef="FinanceApproval" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="FinanceApproval" targetRef="PaymentApproved" /><bpmn:sequenceFlow id="Flow_11" name="Нет" sourceRef="PaymentApproved" targetRef="RejectedEnd" /><bpmn:sequenceFlow id="Flow_12" name="Да" sourceRef="PaymentApproved" targetRef="PayInvoice" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="PayInvoice" targetRef="UploadPaymentOrder" /><bpmn:sequenceFlow id="Flow_14" sourceRef="UploadPaymentOrder" targetRef="Webhook" /><bpmn:sequenceFlow id="Flow_15" sourceRef="Webhook" targetRef="NotifyChat" /><bpmn:sequenceFlow id="Flow_16" sourceRef="NotifyChat" targetRef="PaidEnd" />
+  </bpmn:process>
+</bpmn:definitions>
