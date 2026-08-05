@@ -1,32 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Mitlex" targetNamespace="https://mitlex.example/bpmn">
-  <bpmn:process id="Mitlex_Procurement_To_Payment" name="Заявка на закупку: от создания до оплаты" isExecutable="false">
-    <bpmn:laneSet id="LaneSet">
-      <bpmn:lane id="Lane_Initiator" name="Инициатор"><bpmn:flowNodeRef>StartEvent</bpmn:flowNodeRef><bpmn:flowNodeRef>CreateRequest</bpmn:flowNodeRef><bpmn:flowNodeRef>Clarify</bpmn:flowNodeRef></bpmn:lane>
-      <bpmn:lane id="Lane_Procurement" name="Снабжение"><bpmn:flowNodeRef>CreateTrackerIssue</bpmn:flowNodeRef><bpmn:flowNodeRef>DataComplete</bpmn:flowNodeRef><bpmn:flowNodeRef>ProcurementReview</bpmn:flowNodeRef><bpmn:flowNodeRef>ProcurementApproved</bpmn:flowNodeRef></bpmn:lane>
-      <bpmn:lane id="Lane_Finance" name="Финансы"><bpmn:flowNodeRef>FinanceApproval</bpmn:flowNodeRef><bpmn:flowNodeRef>PaymentApproved</bpmn:flowNodeRef></bpmn:lane>
-      <bpmn:lane id="Lane_Accounting" name="Бухгалтерия"><bpmn:flowNodeRef>PayInvoice</bpmn:flowNodeRef><bpmn:flowNodeRef>UploadPaymentOrder</bpmn:flowNodeRef><bpmn:flowNodeRef>PaidEnd</bpmn:flowNodeRef></bpmn:lane>
-      <bpmn:lane id="Lane_Service" name="Yandex Tracker / Flask / Messenger"><bpmn:flowNodeRef>Webhook</bpmn:flowNodeRef><bpmn:flowNodeRef>NotifyChat</bpmn:flowNodeRef></bpmn:lane>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_Mitlex" targetNamespace="https://mitlex.example/bpmn" exporter="Camunda Modeler" exporterVersion="5.45.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:process id="Mitlex_Tracker_Messenger" name="Заявка и уведомления: Yandex Forms → Tracker → Messenger" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Mitlex">
+      <bpmn:lane id="Lane_Initiator" name="Инициатор"><bpmn:flowNodeRef>StartEvent_Request</bpmn:flowNodeRef><bpmn:flowNodeRef>Task_FillForm</bpmn:flowNodeRef><bpmn:flowNodeRef>Task_ClarifyRequest</bpmn:flowNodeRef><bpmn:flowNodeRef>Task_WorkOnRequest</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Forms" name="Yandex Forms"><bpmn:flowNodeRef>Gateway_FieldsComplete</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Tracker" name="Yandex Tracker"><bpmn:flowNodeRef>Service_CreateIssue</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_AssignRoute</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_EmitCreated</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_EmitUpdate</bpmn:flowNodeRef><bpmn:flowNodeRef>Gateway_RequestCompleted</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Bridge" name="Python / Flask integration"><bpmn:flowNodeRef>Service_VerifyCreated</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_FormatCreated</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_VerifyUpdate</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_RouteThread</bpmn:flowNodeRef></bpmn:lane>
+      <bpmn:lane id="Lane_Messenger" name="Yandex Messenger"><bpmn:flowNodeRef>Service_NotifyOwner</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_NotifyInitiator</bpmn:flowNodeRef><bpmn:flowNodeRef>Service_UpdateThread</bpmn:flowNodeRef><bpmn:flowNodeRef>EndEvent_Completed</bpmn:flowNodeRef></bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:startEvent id="StartEvent" name="Потребность в закупке" />
-    <bpmn:userTask id="CreateRequest" name="Создать заявку в Yandex Forms" />
-    <bpmn:serviceTask id="CreateTrackerIssue" name="Создать задачу в Yandex Tracker" />
-    <bpmn:exclusiveGateway id="DataComplete" name="Данные полны?" />
-    <bpmn:userTask id="Clarify" name="Уточнить данные заявки" />
-    <bpmn:userTask id="ProcurementReview" name="Проверить потребность и условия" />
-    <bpmn:exclusiveGateway id="ProcurementApproved" name="Закупка согласована?" />
-    <bpmn:userTask id="FinanceApproval" name="Согласовать счёт и оплату" />
-    <bpmn:exclusiveGateway id="PaymentApproved" name="Оплата одобрена?" />
-    <bpmn:userTask id="PayInvoice" name="Провести оплату" />
-    <bpmn:userTask id="UploadPaymentOrder" name="Загрузить платёжное поручение" />
-    <bpmn:serviceTask id="Webhook" name="Принять webhook JSON-событие" />
-    <bpmn:serviceTask id="NotifyChat" name="Отправить обновление в чат / тред" />
-    <bpmn:endEvent id="PaidEnd" name="Оплата подтверждена" />
-    <bpmn:endEvent id="RejectedEnd" name="Заявка отклонена" />
-    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent" targetRef="CreateRequest" /><bpmn:sequenceFlow id="Flow_2" sourceRef="CreateRequest" targetRef="CreateTrackerIssue" /><bpmn:sequenceFlow id="Flow_3" sourceRef="CreateTrackerIssue" targetRef="DataComplete" />
-    <bpmn:sequenceFlow id="Flow_4" name="Нет" sourceRef="DataComplete" targetRef="Clarify" /><bpmn:sequenceFlow id="Flow_5" sourceRef="Clarify" targetRef="CreateRequest" /><bpmn:sequenceFlow id="Flow_6" name="Да" sourceRef="DataComplete" targetRef="ProcurementReview" />
-    <bpmn:sequenceFlow id="Flow_7" sourceRef="ProcurementReview" targetRef="ProcurementApproved" /><bpmn:sequenceFlow id="Flow_8" name="Нет" sourceRef="ProcurementApproved" targetRef="RejectedEnd" /><bpmn:sequenceFlow id="Flow_9" name="Да" sourceRef="ProcurementApproved" targetRef="FinanceApproval" />
-    <bpmn:sequenceFlow id="Flow_10" sourceRef="FinanceApproval" targetRef="PaymentApproved" /><bpmn:sequenceFlow id="Flow_11" name="Нет" sourceRef="PaymentApproved" targetRef="RejectedEnd" /><bpmn:sequenceFlow id="Flow_12" name="Да" sourceRef="PaymentApproved" targetRef="PayInvoice" />
-    <bpmn:sequenceFlow id="Flow_13" sourceRef="PayInvoice" targetRef="UploadPaymentOrder" /><bpmn:sequenceFlow id="Flow_14" sourceRef="UploadPaymentOrder" targetRef="Webhook" /><bpmn:sequenceFlow id="Flow_15" sourceRef="Webhook" targetRef="NotifyChat" /><bpmn:sequenceFlow id="Flow_16" sourceRef="NotifyChat" targetRef="PaidEnd" />
+
+    <bpmn:startEvent id="StartEvent_Request" name="Появилась потребность" />
+    <bpmn:userTask id="Task_FillForm" name="Заполнить стандартизированную форму" />
+    <bpmn:exclusiveGateway id="Gateway_FieldsComplete" name="Поля и вложения заполнены?" />
+    <bpmn:userTask id="Task_ClarifyRequest" name="Уточнить заявку" />
+    <bpmn:serviceTask id="Service_CreateIssue" name="Создать задачу с ключевыми полями" />
+    <bpmn:serviceTask id="Service_AssignRoute" name="Назначить очередь, владельца и статус" />
+    <bpmn:serviceTask id="Service_EmitCreated" name="Отправить webhook: задача создана" />
+    <bpmn:serviceTask id="Service_VerifyCreated" name="Проверить подпись и event ID" />
+    <bpmn:serviceTask id="Service_FormatCreated" name="Собрать сообщение: поля и вложения" />
+    <bpmn:sendTask id="Service_NotifyOwner" name="Направить сообщение в чат владельца процесса" />
+    <bpmn:sendTask id="Service_NotifyInitiator" name="Продублировать уведомление инициатору" />
+    <bpmn:userTask id="Task_WorkOnRequest" name="Работать по заявке; менять статус / добавлять вложения" />
+    <bpmn:serviceTask id="Service_EmitUpdate" name="Отправить webhook: статус или вложение" />
+    <bpmn:serviceTask id="Service_VerifyUpdate" name="Проверить и дедуплицировать событие" />
+    <bpmn:serviceTask id="Service_RouteThread" name="Найти чат и исходный тред" />
+    <bpmn:sendTask id="Service_UpdateThread" name="Опубликовать обновление в тред и инициатору" />
+    <bpmn:exclusiveGateway id="Gateway_RequestCompleted" name="Заявка завершена?" />
+    <bpmn:endEvent id="EndEvent_Completed" name="Заявка завершена" />
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_Request" targetRef="Task_FillForm" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_FillForm" targetRef="Gateway_FieldsComplete" />
+    <bpmn:sequenceFlow id="Flow_3" name="Нет" sourceRef="Gateway_FieldsComplete" targetRef="Task_ClarifyRequest" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_ClarifyRequest" targetRef="Task_FillForm" />
+    <bpmn:sequenceFlow id="Flow_5" name="Да" sourceRef="Gateway_FieldsComplete" targetRef="Service_CreateIssue" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Service_CreateIssue" targetRef="Service_AssignRoute" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Service_AssignRoute" targetRef="Service_EmitCreated" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Service_EmitCreated" targetRef="Service_VerifyCreated" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Service_VerifyCreated" targetRef="Service_FormatCreated" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Service_FormatCreated" targetRef="Service_NotifyOwner" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Service_NotifyOwner" targetRef="Service_NotifyInitiator" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Service_NotifyInitiator" targetRef="Task_WorkOnRequest" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_WorkOnRequest" targetRef="Service_EmitUpdate" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Service_EmitUpdate" targetRef="Service_VerifyUpdate" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Service_VerifyUpdate" targetRef="Service_RouteThread" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Service_RouteThread" targetRef="Service_UpdateThread" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Service_UpdateThread" targetRef="Gateway_RequestCompleted" />
+    <bpmn:sequenceFlow id="Flow_18" name="Нет" sourceRef="Gateway_RequestCompleted" targetRef="Task_WorkOnRequest" />
+    <bpmn:sequenceFlow id="Flow_19" name="Да" sourceRef="Gateway_RequestCompleted" targetRef="EndEvent_Completed" />
   </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Mitlex">
+    <bpmndi:BPMNPlane id="BPMNPlane_Mitlex" bpmnElement="Mitlex_Tracker_Messenger">
+      <bpmndi:BPMNShape id="Lane_Initiator_di" bpmnElement="Lane_Initiator" isHorizontal="true"><dc:Bounds x="80" y="80" width="2490" height="145" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Forms_di" bpmnElement="Lane_Forms" isHorizontal="true"><dc:Bounds x="80" y="225" width="2490" height="145" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Tracker_di" bpmnElement="Lane_Tracker" isHorizontal="true"><dc:Bounds x="80" y="370" width="2490" height="145" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Bridge_di" bpmnElement="Lane_Bridge" isHorizontal="true"><dc:Bounds x="80" y="515" width="2490" height="145" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Messenger_di" bpmnElement="Lane_Messenger" isHorizontal="true"><dc:Bounds x="80" y="660" width="2490" height="145" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Request_di" bpmnElement="StartEvent_Request"><dc:Bounds x="140" y="135" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="98" y="174" width="120" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FillForm_di" bpmnElement="Task_FillForm"><dc:Bounds x="235" y="112" width="175" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_FieldsComplete_di" bpmnElement="Gateway_FieldsComplete" isMarkerVisible="true"><dc:Bounds x="480" y="272" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ClarifyRequest_di" bpmnElement="Task_ClarifyRequest"><dc:Bounds x="590" y="112" width="150" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_CreateIssue_di" bpmnElement="Service_CreateIssue"><dc:Bounds x="610" y="402" width="180" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_AssignRoute_di" bpmnElement="Service_AssignRoute"><dc:Bounds x="860" y="402" width="185" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_EmitCreated_di" bpmnElement="Service_EmitCreated"><dc:Bounds x="1110" y="402" width="170" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_VerifyCreated_di" bpmnElement="Service_VerifyCreated"><dc:Bounds x="1350" y="547" width="170" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_FormatCreated_di" bpmnElement="Service_FormatCreated"><dc:Bounds x="1585" y="547" width="190" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_NotifyOwner_di" bpmnElement="Service_NotifyOwner"><dc:Bounds x="1840" y="692" width="205" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_NotifyInitiator_di" bpmnElement="Service_NotifyInitiator"><dc:Bounds x="2110" y="692" width="195" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_WorkOnRequest_di" bpmnElement="Task_WorkOnRequest"><dc:Bounds x="2100" y="112" width="245" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_EmitUpdate_di" bpmnElement="Service_EmitUpdate"><dc:Bounds x="2100" y="402" width="215" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_VerifyUpdate_di" bpmnElement="Service_VerifyUpdate"><dc:Bounds x="2100" y="547" width="180" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_RouteThread_di" bpmnElement="Service_RouteThread"><dc:Bounds x="2340" y="547" width="175" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Service_UpdateThread_di" bpmnElement="Service_UpdateThread"><dc:Bounds x="2330" y="692" width="205" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_RequestCompleted_di" bpmnElement="Gateway_RequestCompleted" isMarkerVisible="true"><dc:Bounds x="2150" y="272" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Completed_di" bpmnElement="EndEvent_Completed"><dc:Bounds x="2240" y="714" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2198" y="755" width="120" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1"><di:waypoint x="176" y="153" /><di:waypoint x="235" y="153" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2"><di:waypoint x="410" y="152" /><di:waypoint x="445" y="152" /><di:waypoint x="445" y="297" /><di:waypoint x="480" y="297" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3"><di:waypoint x="505" y="272" /><di:waypoint x="505" y="225" /><di:waypoint x="665" y="225" /><di:waypoint x="665" y="192" /><bpmndi:BPMNLabel><dc:Bounds x="518" y="237" width="24" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4"><di:waypoint x="590" y="152" /><di:waypoint x="530" y="152" /><di:waypoint x="530" y="90" /><di:waypoint x="322" y="90" /><di:waypoint x="322" y="112" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5"><di:waypoint x="530" y="297" /><di:waypoint x="570" y="297" /><di:waypoint x="570" y="442" /><di:waypoint x="610" y="442" /><bpmndi:BPMNLabel><dc:Bounds x="542" y="350" width="24" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6"><di:waypoint x="790" y="442" /><di:waypoint x="860" y="442" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7"><di:waypoint x="1045" y="442" /><di:waypoint x="1110" y="442" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8"><di:waypoint x="1280" y="442" /><di:waypoint x="1315" y="442" /><di:waypoint x="1315" y="587" /><di:waypoint x="1350" y="587" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9"><di:waypoint x="1520" y="587" /><di:waypoint x="1585" y="587" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10"><di:waypoint x="1775" y="587" /><di:waypoint x="1810" y="587" /><di:waypoint x="1810" y="732" /><di:waypoint x="1840" y="732" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11"><di:waypoint x="2045" y="732" /><di:waypoint x="2110" y="732" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12"><di:waypoint x="2208" y="692" /><di:waypoint x="2208" y="250" /><di:waypoint x="2222" y="250" /><di:waypoint x="2222" y="192" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13"><di:waypoint x="2222" y="192" /><di:waypoint x="2222" y="402" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14"><di:waypoint x="2208" y="482" /><di:waypoint x="2208" y="547" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15"><di:waypoint x="2280" y="587" /><di:waypoint x="2340" y="587" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16"><di:waypoint x="2427" y="627" /><di:waypoint x="2427" y="660" /><di:waypoint x="2432" y="660" /><di:waypoint x="2432" y="692" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17"><di:waypoint x="2432" y="692" /><di:waypoint x="2432" y="660" /><di:waypoint x="2175" y="660" /><di:waypoint x="2175" y="322" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18"><di:waypoint x="2150" y="297" /><di:waypoint x="2020" y="297" /><di:waypoint x="2020" y="95" /><di:waypoint x="2222" y="95" /><di:waypoint x="2222" y="112" /><bpmndi:BPMNLabel><dc:Bounds x="2085" y="276" width="24" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19"><di:waypoint x="2175" y="322" /><di:waypoint x="2175" y="732" /><di:waypoint x="2240" y="732" /><bpmndi:BPMNLabel><dc:Bounds x="2185" y="520" width="24" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

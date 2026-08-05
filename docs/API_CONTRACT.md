@@ -1,17 +1,17 @@
-# Webhook API contract
+# Контракт webhook API
 
-This is a portfolio-level contract. Field names are intentionally generic and not a claim about a specific vendor payload schema.
+Это портфельный контракт: названия полей намеренно обобщены и не претендуют на точное соответствие payload конкретного вендора.
 
 ## `POST /webhooks/tracker`
 
-### Request headers
+### Заголовки запроса
 
-| Header | Required | Description |
+| Заголовок | Обязателен | Назначение |
 | --- | --- | --- |
-| `Content-Type` | yes | `application/json` |
-| `X-Webhook-Secret` | yes | Shared secret, compared in constant time in production |
+| `Content-Type` | да | `application/json` |
+| `X-Webhook-Secret` | да | Общий секрет; в production сравнивается в constant time |
 
-### Minimal body
+### Минимальное тело запроса
 
 ```json
 {
@@ -19,8 +19,8 @@ This is a portfolio-level contract. Field names are intentionally generic and no
   "event_type": "issue.status_changed",
   "issue": {
     "key": "OPS-1042",
-    "summary": "Invoice approval: project Alpha",
-    "status": "Ready for accounting",
+    "summary": "Согласование счёта: проект Alpha",
+    "status": "Передано в бухгалтерию",
     "functional_block": "finance",
     "chat_id": "chat-finance-demo",
     "thread_id": "thread-ops-1042",
@@ -29,34 +29,33 @@ This is a portfolio-level contract. Field names are intentionally generic and no
 }
 ```
 
-### Responses
+### Ответы
 
-| Status | Body | Meaning |
+| Статус | Тело | Значение |
 | --- | --- | --- |
-| `202` | `{"status":"accepted"}` | Event was validated and notification was accepted for delivery |
-| `200` | `{"status":"duplicate"}` | Same event had already been processed |
-| `401` | `{"error":"unauthorized"}` | Missing or invalid secret |
-| `400` | `{"error":"..."}` | Invalid JSON or missing required business fields |
+| `202` | `{"status":"accepted"}` | Событие прошло валидацию и принято к доставке |
+| `200` | `{"status":"duplicate"}` | Такое событие уже обрабатывалось |
+| `401` | `{"error":"unauthorized"}` | Секрет отсутствует или не совпадает |
+| `400` | `{"error":"..."}` | Некорректный JSON или нет обязательных полей |
 
-## Mapping and routing rules
+## Правила маппинга и маршрутизации
 
-| Source field | Bridge action |
+| Поле источника | Действие bridge |
 | --- | --- |
-| `event_id` | Idempotency key |
-| `issue.key`, `summary`, `status` | Included in compact notification |
-| `issue.chat_id` | Preferred target chat; otherwise derive from functional block in configuration |
-| `issue.thread_id` | Reuse discussion context when present |
-| `issue.attachments` | Include attachment count; avoid exposing URLs in public logs |
+| `event_id` | Ключ идемпотентности |
+| `issue.key`, `summary`, `status` | Включаются в компактное уведомление |
+| `issue.chat_id` | Предпочтительный чат; иначе выбирается из конфигурации по функциональному блоку |
+| `issue.thread_id` | Сохраняет контекст обсуждения, если он есть |
+| `issue.attachments` | Передаётся количество вложений, но не URL в публичных логах |
 
-## Example outgoing message
+## Пример исходящего сообщения
 
 ```text
-[OPS-1042] Status: Ready for accounting
-Invoice approval: project Alpha
-Attachments: 1
+[OPS-1042] Статус: Передано в бухгалтерию
+Согласование счёта: проект Alpha
+Вложений: 1
 ```
 
-## Error policy
+## Политика ошибок
 
-Do not acknowledge an event as delivered if the downstream API call fails in a real asynchronous implementation. Queue it with retry metadata and alert after the configured retry budget is exhausted.
-
+В реальной асинхронной реализации событие нельзя считать доставленным при ошибке downstream API: оно попадает в очередь с метаданными для повтора, а после исчерпания лимита попыток создаётся алерт.
