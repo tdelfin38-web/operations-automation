@@ -4,6 +4,8 @@
 
 [Открыть исходник BPMN для Camunda Modeler](diagrams/mitlex_procurement_to_payment.bpmn)
 
+[Скачать PDF-версию BPMN-модели](diagrams/mitlex_procurement_to_payment.pdf)
+
 ## Что отражает модель
 
 1. Инициатор создаёт и при необходимости уточняет заявку.
