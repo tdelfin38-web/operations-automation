@@ -1,21 +1,20 @@
-# Test strategy
+# Стратегия тестирования
 
-The test suite checks the integration risks most likely to damage user trust: a missed update, a message in the wrong context, and a duplicate message.
+Набор тестов покрывает риски, сильнее всего влияющие на доверие пользователей: пропущенный апдейт, сообщение не в том контексте и дубликат уведомления.
 
-| Scenario | Expected result |
+| Сценарий | Ожидаемый результат |
 | --- | --- |
-| Issue enters a route | One message with issue key, summary, and status |
-| Status changes | New event creates a status update in the stored thread |
-| Attachment is added | Message reports attachment presence/count without leaking a URL |
-| Provider retries same webhook | `200 duplicate`; no second Messenger call |
-| Secret is wrong | `401`; no event is stored or delivered |
-| Required routing data absent | `400`; no partial delivery |
+| Задача входит в маршрут | Одно сообщение с ключом, названием и статусом |
+| Меняется статус | Новое событие создаёт обновление в сохранённом треде |
+| Добавляется вложение | Сообщение показывает наличие/количество вложений, не раскрывая URL |
+| Провайдер повторно присылает webhook | `200 duplicate`; второй вызов Messenger не происходит |
+| Неверный секрет | `401`; событие не сохраняется и не доставляется |
+| Нет данных для маршрутизации | `400`; частичная доставка не выполняется |
 
-Run locally:
+Локальный запуск:
 
 ```bash
 pytest -q
 ```
 
-For a production rollout, add contract tests against a sandbox, load tests for burst events, secret-rotation tests, and end-to-end acceptance scripts in the TEST queue before any OPS change.
-
+Перед production rollout нужны контрактные тесты с sandbox, нагрузочный тест пачек событий, проверка ротации секретов и end-to-end сценарии приёмки в очереди `TEST` до любого изменения в `OPS`.

@@ -1,28 +1,28 @@
-# Architecture
+# Архитектура
 
-## Design principle
+## Принцип проектирования
 
-Tracker owns the workflow state. The bridge does not decide whether an invoice is approved or mutate Tracker records: it turns already-authorised Tracker events into clear, correctly routed chat updates.
+Yandex Tracker владеет состоянием workflow. Bridge не принимает решение о согласовании и не меняет задачу: он превращает уже авторизованные события Tracker в понятные, корректно направленные обновления в чате.
 
 ```mermaid
 flowchart TB
-    subgraph Input
-      FORM[Yandex Forms\nstructured request]
-      USER[Employee]
+    subgraph Ввод
+      FORM[Yandex Forms<br/>структурированная заявка]
+      USER[Сотрудник]
     end
     subgraph Workflow
-      TRACKER[Yandex Tracker\nqueues, fields, statuses, triggers]
-      WIKI[Yandex Wiki\ninstructions and policy]
+      TRACKER[Yandex Tracker<br/>очереди, поля, статусы, триггеры]
+      WIKI[Yandex Wiki<br/>инструкции и правила]
     end
-    subgraph Integration
+    subgraph Интеграция
       WEBHOOK[POST /webhooks/tracker]
-      VERIFY[Verify signature\nand event id]
-      NORMALISE[Normalise issue, status,\nattachments, chat/thread]
-      ROUTE[Resolve target\nchat and thread]
-      STORE[(Idempotency\nstore)]
+      VERIFY[Проверка подписи<br/>и event ID]
+      NORMALISE[Нормализация задачи, статуса,<br/>вложений, чата и треда]
+      ROUTE[Выбор целевого<br/>чата и треда]
+      STORE[(Хранилище<br/>идемпотентности)]
     end
-    subgraph Communication
-      BOT[Yandex Messenger\nBot API]
+    subgraph Коммуникация
+      BOT[Yandex Messenger<br/>Bot API]
     end
     FORM --> TRACKER
     USER --> TRACKER
@@ -31,30 +31,29 @@ flowchart TB
     TRACKER <--> WIKI
 ```
 
-## Event lifecycle
+## Жизненный цикл события
 
-1. A structured form or employee creates/updates an issue in Tracker.
-2. Tracker workflow validates fields, changes state, and emits an event.
-3. The bridge authenticates the request, rejects malformed payloads, and claims its event ID.
-4. It extracts the issue key, summary, status, attachments, functional block, and saved chat/thread context.
-5. Routing selects the project/functional chat and reuses the existing thread when present.
-6. The bot posts one compact update; the event is retained as processed to make retries safe.
+1. Структурированная форма или сотрудник создаёт либо обновляет задачу в Tracker.
+2. Workflow Tracker валидирует поля, меняет статус и отправляет событие.
+3. Bridge аутентифицирует запрос, отклоняет некорректный payload и резервирует `event_id`.
+4. Он извлекает ключ задачи, название, статус, вложения, функциональный блок и сохранённый контекст чата/треда.
+5. Маршрутизация выбирает чат процесса и при наличии использует прежний тред.
+6. Бот публикует компактный апдейт; событие помечается обработанным, поэтому повторная доставка безопасна.
 
-## Boundaries
+## Границы компонентов
 
-| Component | Responsibility | Not responsible for |
+| Компонент | Отвечает за | Не отвечает за |
 | --- | --- | --- |
-| Forms | Capture mandatory request data | Workflow approval |
-| Tracker | State machine, access, task history, triggers | Message formatting/delivery |
-| Flask bridge | Verify, normalise, route, deduplicate, deliver | Business approval decisions |
-| Messenger | Timely human-facing notification and discussion | System-of-record storage |
-| Wiki | Rules, templates, operating instructions | Event processing |
+| Forms | Обязательные данные заявки | Согласование по workflow |
+| Tracker | Статусы, права, историю, триггеры | Форматирование и доставку сообщений |
+| Flask bridge | Проверку, нормализацию, маршрутизацию, дедупликацию и доставку | Бизнес-решения по заявке |
+| Messenger | Оперативное уведомление и обсуждение | Хранение системного статуса |
+| Wiki | Инструкции, шаблоны и правила | Обработку событий |
 
-## Reliability and security
+## Надёжность и безопасность
 
-- TLS termination and a shared webhook secret are required; reject unauthenticated requests.
-- Event ID is persisted before sending. A production store should be transactional and have an expiry policy.
-- Retries are safe: an already-claimed event returns `duplicate` without another message.
-- Secrets belong only in environment variables; payload logs must redact tokens, personal data, and file URLs.
-- Failed deliveries require structured logs, alerting, and a replay path; no silent loss of a workflow event.
-
+- Нужны TLS и shared secret webhook; неаутентифицированные запросы отклоняются.
+- `event_id` сохраняется до отправки. В production потребуется транзакционное хранилище и политика истечения записей.
+- Повторная доставка безопасна: для уже занятого `event_id` возвращается `duplicate` без нового сообщения.
+- Секреты хранятся только в переменных окружения; из логов исключаются токены, персональные данные и URL файлов.
+- Ошибки доставки должны попадать в структурированные логи, мониторинг и сценарий повтора.

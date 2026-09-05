@@ -1,12 +1,11 @@
-# Risks and mitigations
+# Риски и меры снижения
 
-| Risk | Impact | Mitigation |
+| Риск | Последствие | Мера снижения |
 | --- | --- | --- |
-| Duplicate delivery after provider retry | Notification fatigue and loss of trust | Persistent idempotency key, atomic claim, replay audit |
-| Wrong chat or thread | Information leakage / missed action | Explicit routing metadata, allowlist, TEST-to-OPS promotion checklist |
-| Webhook spoofing | Unauthorised messages | TLS, secret/signature verification, secret rotation |
-| Changed Tracker fields or workflow | Broken parsing | Versioned contract, schema validation, contract tests |
-| Messenger API outage | Missed notification | Retry queue, dead-letter handling, monitoring, manual replay |
-| Sensitive documents in logs | Data exposure | Redaction, minimal logging, restricted retention/access |
-| Automation bypasses human decision | Incorrect business outcome | Keep workflow authority in Tracker and approval owners |
-
+| Повторная доставка после retry провайдера | Лишние уведомления и потеря доверия | Устойчивый ключ идемпотентности, атомарное резервирование, аудит повторов |
+| Неверный чат или тред | Утечка информации либо пропуск действия | Явные метаданные маршрута, allowlist, checklist перевода `TEST` → `OPS` |
+| Подмена webhook | Несанкционированные сообщения | TLS, проверка секрета/подписи, ротация секретов |
+| Изменение полей или workflow Tracker | Ошибка разбора payload | Версионированный контракт, валидация схемы, contract tests |
+| Недоступность Messenger API | Пропущенное уведомление | Очередь повторов, dead-letter обработка, мониторинг, ручной replay |
+| Чувствительные документы в логах | Раскрытие данных | Редакция, минимальное логирование, ограниченный срок и доступ |
+| Автоматизация обходит решение человека | Некорректный бизнес-результат | Право решения остаётся у Tracker и владельцев согласования |

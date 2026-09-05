@@ -1,41 +1,40 @@
-# Requirements and acceptance criteria
+# Требования и критерии приёмки
 
 ## User stories
 
-### Request initiator
+### Инициатор заявки
 
-As a request initiator, I want to submit a request with type, project/object, deadline, attachments, and responsible functional block, so that the process starts without a parallel chat clarification.
+Как инициатор, я хочу отправлять заявку с типом, объектом/проектом, сроком, вложениями и ответственным функциональным блоком, чтобы процесс начинался без параллельных уточнений в чатах.
 
-**Acceptance criteria:** mandatory fields are validated; issue enters the correct queue; next owner and status are visible; attachments are available to subsequent participants.
+**Критерии приёмки:** обязательные поля валидируются; задача попадает в нужную очередь; видны следующий владелец и статус; вложения доступны следующим участникам процесса.
 
-### Finance and accounting
+### Финансы и бухгалтерия
 
-As a finance or accounting specialist, I want to receive a related task with synchronised key fields and files, so that I can approve and pay without re-entering information.
+Как сотрудник финансов или бухгалтерии, я хочу получать связанную задачу с синхронизированными ключевыми полями и файлами, чтобы согласовать и провести оплату без повторного ввода информации.
 
-**Acceptance criteria:** related issue is created by workflow rules; approved information is transferred; relevant chat receives one status update; a payment document can be returned to the process context.
+**Критерии приёмки:** workflow создаёт связанную задачу; согласованная информация передаётся; релевантный чат получает одно обновление статуса; платёжный документ возвращается в контекст процесса.
 
-### Project participant
+### Участник проекта
 
-As a project participant, I want notifications for my object to arrive in the correct chat and thread, so that events from unrelated projects do not mix.
+Как участник проекта, я хочу получать уведомления по своему объекту в корректном чате и треде, чтобы события других проектов не смешивались с моими.
 
-**Acceptance criteria:** routing is driven by project/context; saved thread is reused; duplicate webhooks do not create duplicate messages; TEST and production routes are isolated.
+**Критерии приёмки:** маршрут определяется по проектному контексту; существующий тред переиспользуется; повторный webhook не создаёт повторное сообщение; маршруты `TEST` и production изолированы.
 
-## Functional requirements
+## Функциональные требования
 
-- Handle issue creation, status change, and attachment events.
-- Extract issue data without coupling notification logic to undocumented field IDs.
-- Route to chat/thread by explicit metadata, with a configuration fallback per functional block.
-- Provide idempotent processing by stable event ID.
-- Return machine-readable HTTP outcomes and record diagnostic context safely.
+- Обрабатывать события создания задачи, смены статуса и добавления вложения.
+- Извлекать данные задачи без жёсткой привязки логики уведомлений к недокументированным ID полей.
+- Направлять сообщение в чат/тред по явным метаданным и использовать конфигурационный fallback по функциональному блоку.
+- Обеспечивать идемпотентность по стабильному `event_id`.
+- Возвращать машиночитаемые HTTP-результаты и безопасно сохранять диагностический контекст.
 
-## Non-functional requirements
+## Нефункциональные требования
 
-- Never store or expose access tokens in source, payload samples, or logs.
-- Process normal events quickly enough for an operational notification (target: under 30 seconds including downstream delivery).
-- Make delivery failures observable and replayable.
-- Keep TEST and production configuration separate.
+- Не хранить и не раскрывать токены в исходниках, примерах payload или логах.
+- Доставлять обычное операционное уведомление достаточно быстро: целевой срок — до 30 секунд с учётом downstream доставки.
+- Делать сбои доставки наблюдаемыми и пригодными для повтора.
+- Хранить конфигурации `TEST` и production раздельно.
 
-## Out of scope
+## Вне scope bridge
 
-User provisioning, financial approval rules, changing Tracker workflow states from the bridge, and long-term attachment storage are out of scope for this service.
-
+Управление пользователями, бизнес-правила финансового согласования, изменение статусов Tracker со стороны bridge и долгосрочное хранение вложений.
