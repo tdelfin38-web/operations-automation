@@ -1,0 +1,12 @@
+{
+  "event_id": "evt-demo-attachment-001",
+  "event_type": "issue.attachment_added",
+  "issue": {
+    "key": "OPS-1042",
+    "summary": "Invoice approval: project Alpha",
+    "status": "Paid",
+    "chat_id": "chat-finance-demo",
+    "thread_id": "thread-ops-1042",
+    "attachments": [{"id": "file-demo-1", "name": "payment-confirmation.pdf"}]
+  }
+}

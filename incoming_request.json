@@ -1,9 +1,0 @@
-{
-  "event_id": "demo-event-2026-001",
-  "issue_id": "REQ-DEMO-42",
-  "request_type": "procurement",
-  "status": "invoice_ready",
-  "initiator": "demo.requester",
-  "project": "Demo construction project",
-  "attachments": ["invoice-demo.pdf"]
-}
