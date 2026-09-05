@@ -1,6 +1,10 @@
 # Process model: procurement request to payment
 
-This is a simplified, anonymised public representation of a process modelled in BPMN during the project. It communicates the business hand-offs and automation boundaries without disclosing internal rules, names, or identifiers.
+Это упрощённая обезличенная публичная версия процесса, смоделированного в BPMN в ходе проекта. Исходный файл выполнен в стандарте BPMN 2.0 и открывается в Camunda Modeler.
+
+![BPMN: заявка на закупку — от создания до оплаты](diagrams/mitlex_procurement_to_payment.svg)
+
+[Открыть исходник BPMN для Camunda Modeler](diagrams/mitlex_procurement_to_payment.bpmn)
 
 ```mermaid
 flowchart LR
