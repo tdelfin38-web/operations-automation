@@ -1,8 +1,8 @@
 # Mitlex — цифровая модернизация операционных процессов
 
-> Боевой кейс в ООО «МИТЛЕКС ТД»: от диагностики процессов и проектирования TO-BE к запуску рабочих маршрутов и Python/Flask-интеграции Yandex Tracker × Yandex Messenger.
+> Практический проект в ООО «МИТЛЕКС ТД»: от диагностики процессов и проектирования TO-BE к запуску рабочих маршрутов и Python/Flask-интеграции Yandex Tracker × Yandex Messenger.
 
-![Business case](https://img.shields.io/badge/type-commercial%20case-2E8B57) ![Domain](https://img.shields.io/badge/domain-construction-6C63FF) ![Integration](https://img.shields.io/badge/integration-Tracker%20%C3%97%20Messenger-005BFF) ![Stack](https://img.shields.io/badge/stack-Python%20%2B%20Flask-3776AB)
+![Commercial project](https://img.shields.io/badge/type-commercial%20project-2E8B57) ![Domain](https://img.shields.io/badge/domain-construction-6C63FF) ![Integration](https://img.shields.io/badge/integration-Tracker%20%C3%97%20Messenger-005BFF) ![Stack](https://img.shields.io/badge/stack-Python%20%2B%20Flask-3776AB)
 
 ## Кейс
 
